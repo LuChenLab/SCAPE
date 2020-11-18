@@ -2,14 +2,15 @@ import os
 import sys
 import click
 import signal
-from numpy.lib.arraysetops import isin
 import tqdm
 import time
-from pathlib import Path
 import pandas as pd
+import scipy.io, scipy.sparse
+from numpy.lib.arraysetops import isin
+from pathlib import Path
+
 
 from loguru import logger
-import scipy.io, scipy.sparse
 from multiprocessing import Pool
 from multiprocessing.pool import MaybeEncodingError
 from multiprocessing import set_start_method
@@ -22,7 +23,6 @@ logger.add('apamix.log',
             rotation='10 MB',
             colorize=True,
             level="DEBUG")
-
 
 
 @click.command()

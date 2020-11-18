@@ -33,6 +33,14 @@ Options:
   --help         Show this message and exit.
 ```
 
+run
+
+```shell
+
+python main.py prepare --gtf GRCh38.p12.cr.gtf.gz --prefix GRCh38
+
+```
+
 ### apamix
 
 ```
@@ -48,4 +56,18 @@ Options:
   --cb TEXT        The cell barcode file, one cb for one line.  [required]
   -v, --verbose    Verbose mode
   --help           Show this message and exit.
+```
+
+run
+
+
+```shell
+
+python main.py apamix \
+--bed GRCh38_utr.bed \
+--bam input.bam \
+--out data/ \
+--cores 12 \
+--cb cellbarcode.tsv
+
 ```
