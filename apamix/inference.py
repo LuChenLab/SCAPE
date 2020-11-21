@@ -249,15 +249,6 @@ def run(arg):
 
     res = res.drop('cb', axis=1).fillna(0).astype('int64')
 
-    # new line add to check the time consulting region
-    time_used_file = f'{outdir}/TimeConsulting/{chrom}_{left_site}_{right_site}_{strand}'
-    time_used_file_fh = open(time_used_file, 'w')
-    t1 = time.time()
-
-    time_used = t1 - t0
-    time_used_file_fh.write(f'{time_used}\n')
-    time_used_file_fh.close()
-
     logger.debug(f'Done! {chrom}, {left_site}, {right_site}, {strand}')
     return res
 

@@ -9,7 +9,8 @@ def make_df(file, label):
 	return(df)
 
 def main(args):
-	files, labels, outfile = args
+	files, labels, outfile, group_threshold = args
+	group_threshold = int(group_threshold)
 	tmp_list = []
 	for file, label in zip(files.split(','), labels.split(',')):
 		tmp_list.append(make_df(file, label))
@@ -20,11 +21,11 @@ def main(args):
 	ind = 0
 	for group_info, group_df in df:
 		chrom, strand = group_info
-		group_ids = (group_df.pa > group_df.pa.shift() + 50).cumsum()
+		group_ids = (group_df.pa > group_df.pa.shift() + group_threshold).cumsum()
 		group_df = group_df.groupby(group_ids)
 		for _, sub_df in group_df:
 			ind += 1
-			print(ind)
+			# print(ind)
 			if ind % 10000 == 0:
 				print(f'prcessing {ind} line')
 			pasite = sub_df.pa.values.tolist()
