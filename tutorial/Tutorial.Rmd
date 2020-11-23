@@ -1,0 +1,268 @@
+---
+
+title: "Post SCAPE analysis"
+author: "Zhouran"
+date: "11/23/2020"
+output:
+  md_document:
+    variant: markdown_github
+
+---
+
+# Introduction
+
+This is a quick walkthrough of the downstream analysis of **SCAPE**.  
+The bone marrow and brain datasets has been processed by SCAPE.
+
+## Match the polyadenylation site for multiple samples.
+
+```{bash}
+
+/Users/zhouran/miniconda3/bin/python ../scripts/group_pa.py \
+--files BoneMarrow1/pasite.csv.gz,BoneMarrow2/pasite.csv.gz,BoneMarrow3/pasite.csv.gz,Brain1/pasite.csv.gz,Brain2/pasite.csv.gz \
+--labels BoneMarrow1,BoneMarrow2,BoneMarrow3,Brain1,Brain2 \
+--group_threshold 100 --outfile collapse_pa.tsv.gz
+
+```
+
+## Running annotation of given pA sites.
+
+```{r}
+
+suppressMessages(library(org.Mm.eg.db))
+suppressMessages(library(GenomicAlignments))
+suppressMessages(library(annotatr))
+txt2bed <- function(file) {
+  df <- read.table(file, header = T, stringsAsFactor = F)
+  df <-
+    unique(data.frame(df$chrom, df$collapse_pa, df$chrom, df$strand))
+  colnames(df) <- c("chr", "end", "beta", "strand")
+  df$start <- as.integer(as.character(df$end)) - 1
+  df$score <- '.'
+  df <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
+  return(df)
+}
+
+dbfile <- ''
+pa_file <- 'collapse_pa.tsv.gz'
+
+annotation <- readRDS(dbfile)
+
+
+pa_region <- txt2bed(file)
+
+
+res <- annotate_regions(
+  regions = pa_region,
+  annotations = annotation,
+  ignore.strand = FALSE,
+  quiet = FALSE
+)
+
+df <- as.data.frame(res, row.names = 1:length(res))
+write.table(
+  df,
+  glue::glue('{ourdir}/all.Annotation.txt'),
+  sep = '\t',
+  row.names = FALSE
+)
+inds <-
+  c(
+    "seqnames",
+    "end",
+    "strand",
+    "beta",
+    "annot.start",
+    "annot.end",
+    "annot.tx_name",
+    "annot.gene_id",
+    "annot.symbol",
+    "annot.entrez",
+    "annot.id"
+  )
+df <- df[, inds]
+df <-
+  cbind(df, as.data.frame(do.call(rbind, strsplit(df$annot.id, split = ':'))))
+
+colnames(df)[c(12, 13)] <- c('Type', 'Rank')
+df <- df[,-11]
+levels(df$Type)[7] <- 'INTRONIC'
+
+df_lst <-
+  split(df, paste(df$seqnames, df$end, df$strand, sep = ':'))
+df_lst <- lapply(df_lst, function(x) {
+  ind <- order(x$Type)[1]
+  return(x[ind,])
+})
+
+df_lst <- do.call(rbind, df_lst)
+df_lst$pa_site <- rownames(df_lst)
+write.table(
+  df_lst,
+  glue::glue('Annotation.unique.withTxName.txt'),
+  sep = '\t',
+  row.names = FALSE,
+  quote = F
+)
+
+
+```
+
+## Load expression data into R
+
+```{r}
+
+pa_group_info <-
+  data.table::fread('collapse_pa.tsv.gz')
+
+pa_group_info$pa <-
+  paste(pa_group_info$chrom,
+        pa_group_info$collapse_pa,
+        pa_group_info$strand,
+        sep = ':')
+
+
+files <-
+  c("Brain_1",
+    "Brain_2",
+    "BoneMarrow_1",
+    "BoneMarrow_2",
+    "BoneMarrow_3")
+
+sample_label <- files
+
+parallel::mclapply(files, function(file) {
+  message(file)
+  
+  mtx <- read.csv(glue::glue('{file}/pasite.csv.gz'), row.names = 1)
+  
+  # colnames
+  pa <- data.frame(V1 = rownames(mtx), stringsAsFactors = F)
+  
+  pa$V2 <-
+    plyr::mapvalues(
+      from = pa_group_info$pa_site,
+      to = pa_group_info$pa,
+      x = pa$V1,
+      warn_missing = F
+    )
+  pa_dup <- pa[pa$V2 %in% pa$V2[duplicated(pa$V2)],]
+  
+  
+  mtx_dup <-
+    do.call(rbind, lapply(split(pa_dup$V1, pa_dup$V2), function(x) {
+      colSums(mtx[x, ])
+    }))
+  
+  mtx <- rbind(mtx[setdiff(pa$V1, pa_dup$V1), ], mtx_dup)
+  
+  sample_id <- sample_label[file, 'V2']
+  colnames(mtx) <- paste(sample_id, colnames(mtx), sep = '.')
+  dat <-
+    CreateSeuratObject(mtx, project = sample_id, names.delim = '[.]')
+  saveRDS(dat, glue::glue('{file}.Rds'))
+  # return(NULL)
+},
+mc.cores = 8)
+
+
+```
+
+## DEXseq2 analysis
+
+```{r}
+library(magrittr)
+library(DEXSeq)
+
+
+# make annotation
+pa_anno <-
+  read.table(
+    'Annotation.unique.withTxName.txt',
+    stringsAsFactors = F,
+    header = T
+  )
+pa_anno <- pa_anno[!is.na(pa_anno$annot.symbol),]
+
+#make counts information
+count_info <- readRDS('pseudobulk.Rds')
+count_info <- count_info[pa_anno$pa_site,]
+
+sampleTable = data.frame(
+  row.names = c(
+    "BoneMarrow_1",
+    "BoneMarrow_4",
+    "BoneMarrow_5",
+    "Brain_1",
+    "Brain_2"
+  ),
+  condition = c("BoneMarrow", "BoneMarrow", "BoneMarrow", "Brain", "Brain")
+)
+
+dxd <- DEXSeqDataSet(
+  count_info[, rownames(sampleTable)],
+  sampleTable,
+  design = ~ sample + exon + condition:exon,
+  pa_anno$pa_site,
+  pa_anno$annot.symbol,
+  featureRanges = NULL,
+  transcripts = NULL,
+  alternativeCountData = NULL
+)
+
+dxd %<>%
+  estimateSizeFactors %<>%
+  estimateDispersions %<>%
+  testForDEU %<>%
+  estimateExonFoldChanges
+pdf('ma.pdf')
+plotDispEsts(dxd)
+dev.off()
+
+# dxd <- estimateExonFoldChanges(dxd, fitExptoVar = "condition")
+dxr1 <- DEXSeqResults(dxd)
+
+saveRDS(dxd, file = 'dxd.Rds')
+saveRDS(dxr1, file = 'dxr.Rds')
+
+
+dxr1 <- readRDS('dxr.Rds')
+
+dxr1_p <- dxr1[!is.na(dxr1$padj) & dxr1$padj < 0.05, ]
+dxr1_p <- as.data.frame(dxr1_p)
+bm_counts <- dxr1_p[, grep('countData.BoneMarrow', colnames(dxr1_p))]
+bm_pa <- rownames(bm_counts)[rowSums(+(bm_counts > 0)) == 3]
+
+brain_counts <- dxr1_p[, grep('countData.Brain', colnames(dxr1_p))]
+brain_pa <- rownames(brain_counts)[rowSums(+(brain_counts > 0)) == 2]
+
+dxr1_p <- dxr1_p[intersect(brain_pa, bm_pa), ]
+
+
+de_lst <- split(dxr1_p, dxr1_p$groupID)
+
+apa_de <- unlist(lapply(de_lst, function(x) {
+  dim(x)[1] != 1
+}))
+apa_de <- de_lst[apa_de]
+do.call(cbind, sapply(apa_de, '[[', 'log2fold_Brain_BoneMarrow'))
+
+apa_de <- do.call(rbind, apa_de)
+
+library(ggplot2)
+apa_de$label <- paste(apa_de$groupID, apa_de$featureID, sep = '_')
+pdf('de_color.pdf', 5, 4)
+ggplot(apa_de, aes(x = log2fold_Brain_BoneMarrow, y = -log10(padj))) +
+  geom_point(aes(color = log2(exonBaseMean + 1))) + theme_bw()
+dev.off()
+write.table(
+  apa_de[!(colnames(apa_de) %in% 'genomicData')],
+  file = 'apa_de.tsv',
+  quote = F,
+  sep = '\t',
+  row.names = F
+)
+
+
+```
+

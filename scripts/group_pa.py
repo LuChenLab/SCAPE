@@ -4,12 +4,13 @@ import pandas as pd
 import numpy as np
 
 
+
 def make_df(file, label):
-	df = pd.read_table(file, sep = ',')
+	df = pd.read_csv(file)
 	df = df.rename(columns = {df.columns[0]:'pa_site'})
-	df['pseudo_expr'] = df.drop('pa_site', axis=1).sum(axis=1)
+	df.loc[:,'pseudo_expr'] = df.drop('pa_site', axis=1).sum(axis=1)
 	df = df[['pa_site', 'pseudo_expr']]
-	df['label'] = label
+	df.loc[:,'label'] = label
 	tmp_df = pd.DataFrame(list(map(lambda x: x.split(':'), df.pa_site.values.tolist())), columns = ['chrom', 'pa','beta','strand'])
 	df = pd.concat([df, tmp_df],axis=1)
 	return(df)
@@ -33,12 +34,15 @@ def run(files, labels, outfile, group_threshold):
 			ind += 1
 			if ind % 10000 == 0:
 				print(f'Prcessed {ind} line')
+
+			#  skip the SettingWithCopyError information
+			sub_df = sub_df.copy()
 			pasite = sub_df.pa.values.tolist()
 			pseudo_exp = sub_df.pseudo_expr.values
 			if sum(pseudo_exp) != 0:
-				sub_df['collapse_pa'] = pasite[np.argmax(sub_df.pseudo_expr.values)]
+				sub_df.loc[:, 'collapse_pa'] = pasite[np.argmax(sub_df.pseudo_expr.values)]
 			else:
-				sub_df['collapse_pa'] = pasite[0] if strand == '-' else pasite[-1]
+				sub_df.loc[:, 'collapse_pa'] = pasite[0] if strand == '-' else pasite[-1]
 			res_lst.append(sub_df)
 
 	df = pd.concat(res_lst)

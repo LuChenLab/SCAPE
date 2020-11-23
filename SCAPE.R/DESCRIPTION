@@ -1,0 +1,25 @@
+Package: SCAPE
+Type: Package
+Title: SCAPE.R
+Version: 0.1.0
+Author: Ran Zhou
+Maintainer: Ran Zhou <ranzhou1005@gmail.com>
+Description: Single Cell Alternative Polyadenylation using Expectation-maximization
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Imports: 
+    AnnotationDbi,
+    annotatr,
+    BiocParallel,
+    data.table,
+    DEXSeq,
+    GenomicFeatures,
+    GenomicRanges,
+    glue,
+    parallel,
+    plyr,
+    S4Vectors,
+    Seurat,
+    stringr
