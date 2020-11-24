@@ -1,38 +1,15 @@
----
-title: "Post SCAPE analysis"
-author: 
-- name: Ran Zhou
-  email: ranzhou1005@gmail.com
+Introduction
+============
 
-date: "`r Sys.Date()`"
-output:
-  md_document:
-    variant: markdown_github
-
----
-
-```{r style, echo=FALSE, results="asis", message=FALSE}
-knitr::opts_chunk$set(tidy = FALSE,
-                      warning = FALSE,
-                      message = FALSE)
-
-devtools::load_all('/home/zhouran/data/tmp/annotate_test/SCAPE')
-
-
-```
-
-# Introduction
-
-This is a quick walkthrough of the downstream analysis of **SCAPE**.  
+This is a quick walkthrough of the downstream analysis of **SCAPE**.
 The bone marrow, brain, fetal liver and spleen datasets from Microwell-seq have been processed by SCAPE.
 
-
-## Load the gene expression matrix into Seurat
+Load the gene expression matrix into Seurat
+-------------------------------------------
 
 Load gene expression and umap information from prepared datasets.
 
-
-```{r}
+``` r
 library(Seurat)
 library(SCAPE)
 library(magrittr)
@@ -53,9 +30,7 @@ gene_obj <-
   Seurat::CreateSeuratObject(counts = gene_obj, names.delim = '[.]')
 ```
 
-
-
-```{r fig.dim=c(5,4.5)}
+``` r
 gene_obj %<>% NormalizeData %<>% ScaleData
 
 gene_obj[['umap']] <- umap_coord
@@ -69,16 +44,14 @@ gene_obj[['cellIdent']] <-
 Idents(gene_obj) <- 'cellIdent'
 
 UMAPPlot(gene_obj, label = T) + NoLegend()
-
 ```
 
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
-## Load the APA expression matrix into Seurat.
+Load the APA expression matrix into Seurat.
+-------------------------------------------
 
-
-```{r}
-
-
+``` r
 dir_loc <- system.file("extdata", "", package = "SCAPE")
 files <- list.files(dir_loc, full.names = T, recursive = T)
 
@@ -96,12 +69,12 @@ pa_mtx <- loadData(
   matrix = TRUE,
   cores = 8
 )
-
 ```
 
-## Load pa matrix into Seurat object
+Load pa matrix into Seurat object
+---------------------------------
 
-```{r}
+``` r
 # Only these pA sites whcih expressed in more than 50 cell were kept.
 binary_filter <- Matrix::rowSums(+pa_mtx)
 pa_mtx <- pa_mtx[binary_filter > 50, ]
@@ -109,14 +82,12 @@ pa_mtx <- pa_mtx[binary_filter > 50, ]
 gene_obj[['apa']] <- CreateAssayObject(pa_mtx[, colnames(gene_obj)])
 gene_obj <- NormalizeData(gene_obj, assay = 'apa')
 gene_obj <- ScaleData(gene_obj, assay = 'apa')
-
 ```
 
+Annotation of pA
+----------------
 
-## Annotation of pA
-
-```{r}
-
+``` r
 gtf_file <-
   system.file('extdata', 'GRCm38.p5.genes.gtf.gz', package = 'SCAPE')
 
@@ -127,13 +98,12 @@ annot_info <-
                  gtf_file,
                  'Mm10',
                  cores = 10)
-
 ```
 
-## Find differential apa events
+Find differential apa events
+----------------------------
 
-```{r eval=FALSE}
-
+``` r
 de_res <- SCAPE::FindDE(
   gene_obj,
   idents.1 = 'Erythroblast',
@@ -142,16 +112,11 @@ de_res <- SCAPE::FindDE(
   assay = "apa",
   cores = 20
 )
-
-
 ```
-
 
 Visualization of APA events
 
-
-```{r fig.dim=c(9, 3)}
-
+``` r
 gene_to_check <- c('Bzw1')
 pa <- c('1:58407357:+', '1:58405443:+')
 
@@ -159,6 +124,6 @@ FeaturePlot(gene_obj,
                  c(gene_to_check, pa),
                  order = T,
                  ncol = 3)
-
-
 ```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-7-1.png)
