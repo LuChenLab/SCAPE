@@ -4,7 +4,8 @@ library(Seurat)
 #'@title Loading datasets
 #'@description loading apa matrix into a Seurat object.
 #'@param fileList A named vector of apa matrix file.
-#'@param collapsePa The output of group_pa.py
+#'@param collapsePa The output of `group_pa.py`.
+#'@param matrix Return matrix or Seurat object.
 #'@param cores The num of cpu for processing data.
 #'@example
 #'\dontrun{Not Run
@@ -19,7 +20,10 @@ library(Seurat)
 #'}
 #'
 #'@export
-loadData <- function(fileList, collapsePa, cores = 1) {
+loadData <- function(fileList,
+                     collapsePa,
+                     matrix = FALSE,
+                     cores = 1) {
   pa_group_info <- data.table::fread(collapsePa)
   pa_group_info$pa <-
     paste(pa_group_info$chrom,
@@ -27,7 +31,7 @@ loadData <- function(fileList, collapsePa, cores = 1) {
           pa_group_info$strand,
           sep = ':')
 
-  objs <- mclapply(names(fileList), function(fileLabel) {
+  objs <- parallel::mclapply(names(fileList), function(fileLabel) {
     message(fileLabel)
 
 
@@ -68,6 +72,8 @@ loadData <- function(fileList, collapsePa, cores = 1) {
   }, mc.cores = cores)
 
   objs <- Reduce(merge, objs)
-  objs
+  if (isTRUE(matrix)) {
+    return(Seurat::GetAssayData(objs, 'counts'))
+  }
+  return(objs)
 }
-

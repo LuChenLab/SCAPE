@@ -4,12 +4,14 @@
 \alias{loadData}
 \title{Loading datasets}
 \usage{
-loadData(fileList, collapsePa, cores = 1)
+loadData(fileList, collapsePa, matrix = FALSE, cores = 1)
 }
 \arguments{
 \item{fileList}{A named vector of apa matrix file.}
 
-\item{collapsePa}{The output of group_pa.py}
+\item{collapsePa}{The output of `group_pa.py`.}
+
+\item{matrix}{Return matrix or Seurat object.}
 
 \item{cores}{The num of cpu for processing data.}
 }
