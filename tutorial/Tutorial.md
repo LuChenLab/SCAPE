@@ -31,6 +31,20 @@ gene_obj <-
 ```
 
 ``` r
+gene_obj[["percent.mt"]] <-
+  PercentageFeatureSet(gene_obj, pattern = "^mt-")
+
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA', 'percent.mt'),
+  group.by = 'orig.ident',
+  ncol = 3
+)
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-2-1.png)
+
+``` r
 gene_obj %<>% NormalizeData %<>% ScaleData
 
 gene_obj[['umap']] <- umap_coord
@@ -46,7 +60,7 @@ Idents(gene_obj) <- 'cellIdent'
 UMAPPlot(gene_obj, label = T) + NoLegend()
 ```
 
-![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
 Load the APA expression matrix into Seurat.
 -------------------------------------------
@@ -61,7 +75,10 @@ names(exp_file) <- basename(dirname(exp_file))
 
 # load the collapse pA site file.
 # generate from `script/group_pa.py`
-collapse_pa <- system.file("extdata", "collapse_pa.tsv.gz", package = "SCAPE")
+collapse_pa <-
+  system.file("extdata",
+              "collapse_pa.tsv.gz",
+              package = "SCAPE")
 
 pa_mtx <- loadData(
   fileList = exp_file,
@@ -83,6 +100,18 @@ gene_obj[['apa']] <- CreateAssayObject(pa_mtx[, colnames(gene_obj)])
 gene_obj <- NormalizeData(gene_obj, assay = 'apa')
 gene_obj <- ScaleData(gene_obj, assay = 'apa')
 ```
+
+``` r
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA'),
+  group.by = 'orig.ident',
+  assay = 'apa',
+  ncol = 2
+)
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 Annotation of pA
 ----------------
@@ -126,4 +155,6 @@ FeaturePlot(gene_obj,
                  ncol = 3)
 ```
 
-![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/Bzw1.png)

@@ -390,7 +390,7 @@ AnnotationSite <-
     })
     annot_res_lst <- do.call(rbind, annot_res_lst)
     annot_res_lst$pa_site <- rownames(annot_res_lst)
-    colnames(annot_res)[2] <- 'pa_loc'
+    colnames(annot_res_lst)[2] <- 'pa_loc'
     return(annot_res_lst)
   }
 

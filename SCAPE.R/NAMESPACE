@@ -3,3 +3,6 @@
 export(AnnotationSite)
 export(FindDE)
 export(loadData)
+export(psi)
+export(psiCate)
+import(data.table)

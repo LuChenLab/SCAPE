@@ -54,6 +54,18 @@ gene_obj <-
 ```
 
 
+```{r fig.dim=c(12,4)}
+gene_obj[["percent.mt"]] <-
+  PercentageFeatureSet(gene_obj, pattern = "^mt-")
+
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA', 'percent.mt'),
+  group.by = 'orig.ident',
+  ncol = 3
+)
+
+```
 
 ```{r fig.dim=c(5,4.5)}
 gene_obj %<>% NormalizeData %<>% ScaleData
@@ -88,7 +100,10 @@ names(exp_file) <- basename(dirname(exp_file))
 
 # load the collapse pA site file.
 # generate from `script/group_pa.py`
-collapse_pa <- system.file("extdata", "collapse_pa.tsv.gz", package = "SCAPE")
+collapse_pa <-
+  system.file("extdata",
+              "collapse_pa.tsv.gz",
+              package = "SCAPE")
 
 pa_mtx <- loadData(
   fileList = exp_file,
@@ -113,6 +128,19 @@ gene_obj <- ScaleData(gene_obj, assay = 'apa')
 ```
 
 
+```{r fig.dim=c(8,4)}
+
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA'),
+  group.by = 'orig.ident',
+  assay = 'apa',
+  ncol = 2
+)
+
+```
+
+
 ## Annotation of pA
 
 ```{r}
@@ -129,6 +157,20 @@ annot_info <-
                  cores = 10)
 
 ```
+<!-- ## calculate and classify psi -->
+
+<!-- ```{r} -->
+
+<!-- gene_obj <- -->
+<!--   psi(gene_obj, -->
+<!--       annot = annot_info, -->
+<!--       chunk = 4000, -->
+<!--       cores = 4) -->
+
+<!-- pa_cate <- psiCate(gene_obj, annot_info) -->
+
+<!-- ``` -->
+
 
 ## Find differential apa events
 
