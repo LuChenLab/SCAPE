@@ -33,11 +33,11 @@ psi <- function(obj,
   rownames(annot) <- annot[['V1']]
 
   ##keep PA.id within ensembl gene
-  annoG <- annot[grep("^ENSMUS", annot$V2),]
-  add.id <- annoG[rownames(mat), ]
+  annoG <- annot[grep("^ENSMUS", annot$V2), ]
+  add.id <- annoG[rownames(mat),]
   add.id <- na.omit(add.id)
 
-  pa.geneid.matrix <- mat[add.id$V1, ]
+  pa.geneid.matrix <- mat[add.id$V1,]
 
   # ratio calculating
   ratio <- function(x) {
@@ -61,7 +61,7 @@ psi <- function(obj,
     dt_ratio <- mtx_dt[, lapply(.SD, ratio), by = ensembl.id]
     DT.for.set.sqln(dt_ratio)
     RatioBysum <-
-      Matrix::Matrix(as.matrix(dt_ratio[,-c("id", "ensembl.id")]), sparse = TRUE)
+      Matrix::Matrix(as.matrix(dt_ratio[, -c("id", "ensembl.id")]), sparse = TRUE)
     rownames(RatioBysum) <- dt_ratio$id
     return(RatioBysum)
   }
@@ -74,7 +74,7 @@ psi <- function(obj,
       add.id <- add.id
     } else{
       rownames(add.id) <- add.id$V1
-      add.id <- add.id[rownames(mtx), ]
+      add.id <- add.id[rownames(mtx),]
     }
     if (ncol(mtx) < ncells) {
       PAratio.mtx <- PAratio(mtx)
@@ -105,7 +105,7 @@ psi <- function(obj,
                                        mtx_dt[, lapply(.SD, ratio), by = ensembl.id]
                                      DT.for.set.sqln(dt_ratio)
                                      RatioBysum <-
-                                       Matrix::Matrix(as.matrix(dt_ratio[,-c("id", "ensembl.id")]), sparse = TRUE)
+                                       Matrix::Matrix(as.matrix(dt_ratio[, -c("id", "ensembl.id")]), sparse = TRUE)
                                      rownames(RatioBysum) <-
                                        dt_ratio$id
                                      return(RatioBysum)
@@ -145,7 +145,6 @@ psi <- function(obj,
 psiCate <- function(obj,
                     annot,
                     assay = 'apapsi') {
-  require(data.table)
   # classification function
   ratio_classify <- function(psi.table) {
     fraction.psi <- apply(psi.table, 1, function(x) {
@@ -186,16 +185,56 @@ psiCate <- function(obj,
     )
     return(as.data.frame(a))
   }
+  ratio.fraction <- function(psi.table) {
+    fraction.psi <- apply(psi.table, 1, function(x) {
+      #print(x)
+      ### calculate the observed statistical values
+      out <- c(
+        table(is.na(x))["TRUE"] / length(x),
+        ### number of NAs
+        table(x == 0)["TRUE"] / length(x),
+        ### psi = 0
+        table(x == 1)["TRUE"] / length(x),
+        ### psi = 1
+        table(x > 0 & x < 1)["TRUE"] / length(x),
+        length(na.omit(x)),
+        ### number of nonNA
+        mean(x, na.rm = T),
+        median(x, na.rm = T),
+        var(x, na.rm = T),
+        ### variation
+        sd(x, na.rm = T),
+        ### SD
+        var(x, na.rm = T) / mean(x, na.rm = T) ### CV
+      )
+      out[is.na(out)] <- 0
+      return(round(out, 3))
+    })
+    t(fraction.psi) -> a
+    colnames(a) <- c(
+      "frac.na",
+      "frac.0",
+      "frac.1",
+      "frac.0-1",
+      'num.nonNA',
+      "mean_psi",
+      "median",
+      'Var_psi',
+      'SD_psi',
+      'CV_psi'
+    )
+    return(as.data.frame(a))
+  }
+
   psi_mat <- Seurat::GetAssayData(obj, assay = assay)
-  add.id <- annot[rownames(psi_mat),]
+  add.id <- annot[rownames(psi_mat), ]
 
   tissue.ratio <-
     as.data.frame(as.matrix(psi_mat)) %>%
-    dplyr::mutate(ensembl.id = as.character(add.id$annot.gene_id))
-
-  tissue.ratio <- data.table::as.data.table(tissue.ratio)
-
-  data.table::setkey(tissue.ratio, ensembl.id)
+    dplyr::mutate(ensembl.id = as.character(add.id$annot.gene_id),
+                  id = as.character(add.id$pa_site)) %>%
+    data.table::as.data.table() %>%
+    data.table::setkey(ensembl.id, id)
 
 
   tissue.data <-
@@ -206,21 +245,21 @@ psiCate <- function(obj,
         x = x
       }
       x
-    }), by = 'ensembl.id']
+    }), by = 'ensembl.id', .SDcols = !"id"]
 
-  tissue.data[, "id"] <- add.id$id
+  tissue.data[["id"]] <- tissue.ratio[["id"]]
 
-  psi_mat <- psi_mat[rowSums(psi_mat) > 0,]
+  psi_mat <- psi_mat[Matrix::rowSums(psi_mat) > 0, ]
 
   tissue.use <-
-    tissue.data[tissue.data$id %in% rownames(psi_mat),]
+    tissue.data[tissue.data$id %in% rownames(psi_mat), ]
 
   tissue.fractions <-
-    ratio.fraction(tissue.use[,-c("id", "ensembl.id")])
+    ratio.fraction(tissue.use[, -c("id", "ensembl.id")])
   tissue.fractions$pa = tissue.use$id
   tissue.fractions <- data.table::as.data.table(tissue.fractions)
 
-  arcsin_trans = t(apply(tissue.use[,-c("id", "ensembl.id")], 1, function(x) {
+  arcsin_trans = t(apply(tissue.use[, -c("id", "ensembl.id")], 1, function(x) {
     asin(sqrt(x))
   }))
 

@@ -1,0 +1,257 @@
+Introduction
+============
+
+This is a quick walkthrough of the downstream analysis of **SCAPE**.
+The bone marrow from 8 week mouse have been processed by SCAPE.
+
+Load the gene expression matrix into Seurat
+-------------------------------------------
+
+Load gene expression and umap information from prepared datasets.
+
+``` r
+library(Seurat)
+library(SCAPE)
+library(magrittr)
+library(ggplot2)
+# Load gene expression
+gene_obj <-
+  readRDS(system.file('extdata/HSC', '8w.Rds', package = 'SCAPE'))
+
+#  preprocess
+gene_obj[["percent.mt"]] <-
+  PercentageFeatureSet(gene_obj, pattern = "^mt-")
+```
+
+pre-processing
+--------------
+
+``` r
+VlnPlot(
+  gene_obj,
+  features = c("nFeature_RNA", "nCount_RNA", "percent.mt"),
+  ncol = 3,
+  pt.size = 0.1
+)
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/unnamed-chunk-2-1.png)
+
+``` r
+gene_obj %<>% 
+  subset(subset = nFeature_RNA > 500 & percent.mt < 10)
+
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA', 'percent.mt'),
+  group.by = 'orig.ident',
+  ncol = 3,
+  pt.size = .1
+)
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+``` r
+npcs <- 60
+
+gene_obj %<>%
+  NormalizeData %<>%
+  ScaleData %<>%
+  FindVariableFeatures(selection.method = "vst")
+
+gene_obj %<>%
+  RunPCA(features = VariableFeatures(gene_obj),
+         verbose = F,
+         npcs = 100) %<>%
+  FindNeighbors(reduction = "pca", dims = 1:npcs) %<>%
+  FindClusters(
+    reduction = "pca",
+    resolution = c(0.6, 0.7),
+    dims.use = 1:npcs,
+    print.output = FALSE
+  ) %<>%
+  RunTSNE(
+    reduction = "pca",
+    dims = 1:npcs,
+    check_duplicates = FALSE
+  ) %<>%
+  RunUMAP(reduction = "pca", dims = 1:npcs)
+```
+
+    ## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+    ## 
+    ## Number of nodes: 4301
+    ## Number of edges: 168082
+    ## 
+    ## Running Louvain algorithm...
+    ## Maximum modularity in 10 random starts: 0.9195
+    ## Number of communities: 18
+    ## Elapsed time: 0 seconds
+    ## Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+    ## 
+    ## Number of nodes: 4301
+    ## Number of edges: 168082
+    ## 
+    ## Running Louvain algorithm...
+    ## Maximum modularity in 10 random starts: 0.9124
+    ## Number of communities: 19
+    ## Elapsed time: 0 seconds
+
+``` r
+gene_obj[['cell_ident']] <- plyr::mapvalues(
+  from = 0:17L,
+  to = c(
+    "HSC_1",
+    "Ery_1",
+    "T_cell_1",
+    "HSC_2",
+    "Ery_early",
+    "HSC_2",
+    "HSC_3",
+    "Mast_cell_1",
+    "Ery_2",
+    "Mast_cell_2",
+    "Neutrophil",
+    "T_cell_2",
+    "MEP",
+    "HSC_4",
+    "B_cell",
+    "HSC_5",
+    "Dendritic_cell",
+    "T_cell_3"
+  ),
+  x = Idents(gene_obj)
+)
+
+Idents(gene_obj) <- 'cell_ident'
+```
+
+``` r
+UMAPPlot(gene_obj, label = T) + NoLegend()
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
+Load the APA expression matrix into Seurat.
+-------------------------------------------
+
+``` r
+# selecet the expression file
+exp_file <-
+  system.file("extdata/HSC",
+              "8w.csv.gz",
+              package = "SCAPE")
+names(exp_file) <- 'HSC_8W'
+
+# load the collapse pA site file.
+# generate from `script/group_pa.py`
+
+collapse_pa <- system.file("extdata/HSC",
+                           "8w.tsv.gz",
+                           package = "SCAPE")
+
+pa_mtx <- loadData(
+  fileList = exp_file,
+  collapsePa = collapse_pa,
+  matrix = TRUE,
+  cores = 8
+)
+```
+
+Load pa matrix into Seurat object
+---------------------------------
+
+``` r
+# Only these pA sites whcih expressed in more than 50 cell were kept.
+binary_filter <- Matrix::rowSums(+pa_mtx)
+pa_mtx <- pa_mtx[binary_filter > 50, ]
+
+gene_obj[['apa']] <- CreateAssayObject(pa_mtx[, colnames(gene_obj)])
+gene_obj <- NormalizeData(gene_obj, assay = 'apa')
+gene_obj <- ScaleData(gene_obj, assay = 'apa')
+```
+
+``` r
+VlnPlot(
+  gene_obj,
+  features = c('nFeature_RNA', 'nCount_RNA'),
+  group.by = 'orig.ident',
+  assay = 'apa',
+  ncol = 2
+)
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+Annotation of pA
+----------------
+
+``` r
+gtf_file <-
+  system.file('extdata', 'GRCm38.p5.genes.gtf.gz', package = 'SCAPE')
+
+# It will consume a lot of time if it is the first time to annotate.
+
+annot_info <-
+  AnnotationSite(rownames(GetAssayData(gene_obj, assay = 'apa')),
+                 gtf_file,
+                 'Mm10',
+                 cores = 10)
+```
+
+calculate and classify psi
+--------------------------
+
+``` r
+gene_obj <-
+  psi(gene_obj,
+      annot = annot_info,
+      chunk = 4000,
+      cores = 4)
+
+pa_cate <- SCAPE::psiCate(gene_obj, annot_info)
+```
+
+``` r
+cate_colors = ggsci::pal_nejm()(7)
+names(cate_colors) = c(
+  "Multimodal",
+  "NonExpr",
+  "NonAPA",
+  "L_shape",
+  "J_shape",
+  "OverDispersed",
+  "UnderDispersed"
+)
+
+p1 <-
+  ggplot(pa_cate, aes(mean_psi, SD_psi, color = PA_category)) +
+  geom_point(size = 3, alpha = 0.6) +
+  scale_color_manual(values = cate_colors) +
+  labs(y = 'SD of PAratio', x = 'Mean of PAratio') +
+  theme(
+    plot.title = element_text(hjust = 0.5,
+                              face = 'bold',
+                              size = 16),
+    legend.position = 'top',
+    legend.title = element_text(size = 15),
+    legend.text = element_text(size = 15),
+    axis.text.x = element_text(size = 15),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 15),
+    axis.text.y  = element_text(size = 15),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.line = element_line(colour = "black")
+  )
+
+p1
+```
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+--------------------------
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/psi.png)
