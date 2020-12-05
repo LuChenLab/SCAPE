@@ -36,8 +36,10 @@ loadData <- function(fileList,
 
 
     # Load pA matrix information
-    mtx <- read.csv(fileList[[fileLabel]], row.names = 1)
-
+    tmp <- data.table::fread(fileList[[fileLabel]])
+    mtx <- as.matrix(tmp[,-1])
+    rownames(mtx) <- tmp[['V1']]
+    rm(tmp)
     # Mapping pA ID into collapse ID
     pa <- data.frame(V1 = rownames(mtx), stringsAsFactors = F)
     pa$V2 <-
@@ -47,15 +49,15 @@ loadData <- function(fileList,
         x = pa$V1,
         warn_missing = F
       )
-    pa_dup <- pa[pa$V2 %in% pa$V2[duplicated(pa$V2)], ]
+    pa_dup <- pa[pa$V2 %in% pa$V2[duplicated(pa$V2)],]
 
     # Create new pA matrix
     mtx_dup <-
       do.call(rbind, lapply(split(pa_dup$V1, pa_dup$V2), function(x) {
-        colSums(mtx[x,])
+        colSums(mtx[x, ])
       }))
 
-    mtx <- rbind(mtx[setdiff(pa$V1, pa_dup$V1),], mtx_dup)
+    mtx <- rbind(mtx[setdiff(pa$V1, pa_dup$V1), ], mtx_dup)
 
     rownames(mtx) <-
       plyr::mapvalues(

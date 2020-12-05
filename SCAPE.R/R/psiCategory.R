@@ -24,7 +24,7 @@ psi <- function(obj,
 
   stopifnot("Type" %in% colnames(annot))
 
-  mat <- Seurat::GetAssayData(obj, 'counts', assay = assay)
+  mat <- Seurat::GetAssayData(obj, 'counts', assay = 'apa')
   annot <- annot %>%
     subset(Type != "INTERGENIC") %>%
     dplyr::filter(!is.na(annot.gene_id)) %>%
@@ -120,7 +120,7 @@ psi <- function(obj,
                 annot,
                 ncells = chunk,
                 cores = cores)
-  obj[[slot]] <- CreateAssayObject(Ratiobysum.matrix)
+  obj[[assay]] <- CreateAssayObject(Ratiobysum.matrix)
   obj
 }
 

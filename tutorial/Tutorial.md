@@ -157,4 +157,5 @@ FeaturePlot(gene_obj,
 
 ![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
+----------------------------
 ![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/Tutorial_files/figure-markdown_github/Bzw1.png)
