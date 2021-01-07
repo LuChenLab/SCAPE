@@ -255,3 +255,5 @@ p1
 --------------------------
 
 ![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/psi.png)
+
+![](https://github.com/zhou-ran/SCAPE/blob/main/tutorial/HSC_tutorial_files/figure-markdown_github/sashimi.png)

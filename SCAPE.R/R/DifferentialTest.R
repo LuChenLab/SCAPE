@@ -158,17 +158,26 @@ FindDE <- function(obj,
       FUN = Seurat:::PercentAbove,
       threshold = 0
     )
-  dxr1[["pct.2"]] <-
-    apply(
-      X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.2],
-      MARGIN = 1,
-      FUN = Seurat:::PercentAbove,
-      threshold = 0
-    )
+
   if (is.null(idents.2)) {
+    dxr1[["pct.2"]] <-
+      apply(
+        X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) != idents.1],
+        MARGIN = 1,
+        FUN = Seurat:::PercentAbove,
+        threshold = 0
+      )
     dxr1[['versus']] <- glue::glue('{idents.1}')
   } else {
     dxr1[['versus']] <- glue::glue('{idents.1}_Vs_{idents.2}')
+    dxr1[["pct.2"]] <-
+      apply(
+        X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.2],
+        MARGIN = 1,
+        FUN = Seurat:::PercentAbove,
+        threshold = 0
+      )
+
   }
 
   dxr1 <-

@@ -300,6 +300,7 @@ annotate_from_gtf <-
 #'@param pAsite A list of pA sites, `1:810052:+`
 #'@param gtfFile The standard gtf file.
 #'@param genome_ver The version of genome annotation. Hg38, Hg19, Mm10, Mm9.
+#'@param minoverlap minoverlap.
 #'@param annotLevels The priority of annotaiton.
 #'@param cores The num of cpu for DE test.
 #'@example
@@ -317,6 +318,7 @@ AnnotationSite <-
   function(pAsite,
            gtfFile,
            genome_ver,
+           minoverlap=1L,
            annotLevels = c(
              "3UTRs",
              "Exon",
@@ -354,6 +356,7 @@ AnnotationSite <-
     annot_res <- annotatr::annotate_regions(
       regions = pa_info,
       annotations = annot_db,
+      minoverlap = minoverlap,
       ignore.strand = FALSE,
       quiet = FALSE
     )
