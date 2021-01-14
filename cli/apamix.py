@@ -58,6 +58,14 @@ logger.add('apamix.log',
     required=True
     )
 @click.option(
+    '--tag',
+    type=str,
+    default='CB,UB',
+    help='The cell barcode and UMI tag, for 10X: CB,UB.',
+    required=True
+    )
+
+@click.option(
     '--verbose',
     '-v',
     is_flag=True,
@@ -68,6 +76,7 @@ def apamix(
     bam,
     out,
     cb,
+    tag,
     cores,
     verbose
     ):
@@ -109,7 +118,7 @@ def apamix(
     res_lst = []
     try:
         for x in range(len(peak_lst)):
-            arg = [peak_lst[x], bam, cb_df, out, verbose]
+            arg = [peak_lst[x], bam, cb_df, out, tag, verbose]
             res_lst.append(pool.apply_async(wraper_process, (arg,)))
 
     except KeyboardInterrupt:

@@ -14,12 +14,13 @@ from utils.bam import cigar_support, collapse_intron, check_strand
 
 
 def run(arg):
-    line, bamfile, cb_df, outdir, verbose = arg
+    line, bamfile, cb_df, outdir, tag, verbose = arg
     region_name = line
     chrom, left_site, right_site, strand = line.split('\t')
 
     pickle_tmp = f'{outdir}/tmp/{chrom}_{left_site}_{right_site}_{strand}.pickle'
 
+    cb_tag, umi_tag = list(map(lambda x: x.strip(), tag.split(',')))
 
     t0 = time.time()
     if os.path.exists(pickle_tmp) and os.stat(pickle_tmp).st_size != 0:
@@ -160,8 +161,8 @@ def run(arg):
                 r2_st = right_site - r2_relative_start +  1
         try:
             # for 10X
-            cb = read2.get_tag('CB')
-            umi = read2.get_tag('UB')
+            cb = read2.get_tag(cb_tag)
+            umi = read2.get_tag(umi_tag)
             apa_reads.r2_utr_st_arr.append(r2_st)
             apa_reads.r2_len_arr.append(read2.query_alignment_length)
             apa_reads.r1_len_arr.append(dt)
