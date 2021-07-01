@@ -192,3 +192,73 @@ FindDE <- function(obj,
 
   return(dxr1)
 }
+#'@title Differential expression test for APA events based bayes factor
+#'@description Differential expression test for APA events based bayes factor
+#'@param obj A Seurat object after calculated psi (psi function).
+#'@param idents.1 A sub-cluster from Idents(dat)
+#'@param idents.2 A sub-cluster from Idents(dat). If idents.2 == NULL, then idents.1 versus other all cells.
+#'@param slot The slot data of Seurat, including counts, data and scale.data. defualt: counts
+#'@param assay The name of assay in Seurat class, default: apapsi
+#'@param seedUse The random seed used.
+#'@param cores The num of cpu for DE test.
+#'#'@example
+#'\dontrun{test <- FindBF(
+#'dat,
+#'idents.1 = levels(Idents(dat))[1],
+#'idents.2 = levels(Idents(dat))[2],
+#'slot = counts,
+#'assay = "apapsi",
+#'cores = 20,
+#'
+#')
+#'}
+#'@export
+
+FindBF <- function(obj,
+                   idents.1,
+                   idents.2 = NULL,
+                   slot = 'counts',
+                   assay = 'apapsi',
+                   cores = 1,
+                   seedUse = 1) {
+  set.seed(seedUse)
+  cells.1 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) == idents.1)]
+  
+  # here for idents.1
+  mat.idents.1 <-
+    GetAssayData(obj,
+                 slot = slot,
+                 assay = assay)[, cells.1]
+  
+  # here for idents.2
+  if (is.null(idents.2)) {
+    cells.2 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) != idents.1)]
+  } else {
+    cells.2 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) == idents.2)]
+  }
+
+  mat.idents.2 <- 
+    GetAssayData(obj,
+                 slot = slot,
+                 assay = assay)[, cells.2]
+  parallel::mclapply(rownames(mat.idents.1), function(x){
+    val_1 <- na.omit(mat.idents.1[x, ])
+    val_2 <- na,omit(mat.idents.2[x, ])
+    BayesFactor::ttestBF(
+      x=val_1,
+      y=val_2
+    )@bayesFactor$bf -> bf_val
+    delta_psi <- mean(val_1) - mean(val_2)
+    val <- c(bf_val, delta_psi)
+    names(val)-> c('BayesFactor', 'Delta_psi')
+    val
+  }) -> res
+  as.data.frame(do.call(rbind,res)) -> res
+  res$pa_site <- rownames(mat.idents.1)
+  res
+}
+
+
+
+
+
