@@ -102,8 +102,9 @@ def apamix(
             continue
         chrom, st, en, strand = i.strip().split('\t')
         if int(en) - int(st) + 1 > 6000:
-            too_long_file = f'{out}/TooLongRegion/{chrom}_{st}_{en}_{strand}'
-            Path(too_long_file).touch()
+            logger.info(f'Skip more than 6 kb UTR, {chrom}_{st}_{en}_{strand}')
+            # too_long_file = f'{out}/TooLongRegion/{chrom}_{st}_{en}_{strand}'
+            # Path(too_long_file).touch()
             continue
 
         peak_lst.append(i.strip())
