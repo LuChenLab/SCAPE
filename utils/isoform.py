@@ -2,7 +2,6 @@ from collections import defaultdict
 from utils.utils import wrapdict
 from utils.gtf import GTFfile
 
-
 class Transcripts(GTFfile):
 
     def __init__(self, file):
@@ -32,8 +31,18 @@ class Transcripts(GTFfile):
                     genename = 'None'
                 gene_structure[gid][tid]["chrom"] = line.chrom
                 gene_structure[gid][tid]["gene_name"] = genename
-                gene_structure[gid][tid]["gene_biotype"] = line.attributes["gene_biotype"]
-                gene_structure[gid][tid]["transcript_biotype"] = line.attributes["transcript_biotype"]
+
+                if "gene_biotype" in line.attributes:
+                    gene_structure[gid][tid]["gene_biotype"] = line.attributes["gene_biotype"]
+                elif "gene_type" in line.attributes:
+                    gene_structure[gid][tid]["gene_type"] = line.attributes["gene_type"]
+
+
+                if "transcript_biotype" in line.attributes:
+                    gene_structure[gid][tid]["transcript_biotype"] = line.attributes["transcript_biotype"]
+                elif "transcript_biotype" in line.attributes:
+                    gene_structure[gid][tid]["transcript_biotype"] = line.attributes["transcript_biotype"]
+
                 gene_structure[gid][tid]["strand"] = line.strand
                 gene_structure[gid][tid][line.feature].append(
                     (line.start, line.end)
@@ -44,7 +53,6 @@ class Transcripts(GTFfile):
                     (line.start, line.end)
                     )
         return gene_structure
-
 
 class Iso:
     def __init__(self,

@@ -34,7 +34,7 @@ def prepare(
 
     utr_out = open(utr_outfile, 'w')
     gene_db = '{}.pkl'.format(gtf_prefix)
-    
+    mt_id = set(['MT','CHRM'])
     if os.path.exists(gene_db):
         # if exsit, just read it
         struc = pickle.load(open(gene_db, 'rb'))
@@ -61,6 +61,7 @@ def prepare(
                 line[6]
             ]) + '\n'
         )
+
     exon_from_gtf = pybedtools.BedTool(
         ''.join(exon_from_gtf), 
         from_string=True
@@ -72,11 +73,18 @@ def prepare(
     genes_use = {'antisense', 'lincRNA', 'protein_coding'}
     for gid, tids in struc.items():
         for tid, info in tids.items():
-            if info['gene_biotype'] not in genes_use:
+            if 'gene_type' in info:
+                gene_type_id = 'gene_type'
+                trans_type_id = 'transcript_type'
+            elif 'gene_biotype' in info:
+                gene_type_id = 'gene_biotype'
+                trans_type_id = 'transcript_biotype'
+
+            if info[gene_type_id] not in genes_use:
                 continue
             # remove intron retaintion isoforms
             try:
-                if info['transcript_biotype'] == 'retained_intron':
+                if info[trans_type_id] == 'retained_intron':
                     continue
             except TypeError:
                 pass
@@ -89,11 +97,11 @@ def prepare(
                 info['chrom'],
                 str(st),
                 str(en),
-                ';'.join([info['gene_biotype'], gid, tid, info['gene_name']]),
+                ';'.join([info[gene_type_id], gid, tid, info['gene_name']]),
                 '.',
                 info['strand']
             ]
-            if info['chrom'].upper() == 'MT':
+            if info['chrom'].upper() in mt_id:
                 mt_lst.append('\t'.join(line_info))
             else:
                 utr_out.write('\t'.join(line_info) + '\n')

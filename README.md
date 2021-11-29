@@ -37,8 +37,6 @@ run
 
 ```shell
 
-bedtools sort -i GRCh38.p12.cr.gtf  | bgzip > GRCh38.p12.cr.gtf.gz
-
 python main.py prepare --gtf GRCh38.p12.cr.gtf.gz --prefix GRCh38
 
 ```
