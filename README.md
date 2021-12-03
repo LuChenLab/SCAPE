@@ -1,13 +1,13 @@
 # Single Cell Alternative Polyadenylation using Expectation-maximization (SCAPE)
 
-
+Visit [https://github.com/LuChenLab/SCAPE/wiki](wiki) for SCAPE documentation.
 
 ## Usage
 
 ```
 Usage: main.py [OPTIONS] COMMAND [ARGS]...
 
-  A pure python package for analysing alternative polyadenylation at single
+  An analysis framework for analysing alternative polyadenylation at single
   cell levels. Current version: 1.0.0
 
 Options:
@@ -16,6 +16,7 @@ Options:
 Commands:
   apamix
   prepare
+
 ```
 
 ### prepare
@@ -26,7 +27,7 @@ prepare utr and intron region for inferring alternative polyadenylation
 Usage: main.py prepare [OPTIONS]
 
 Options:
-  --gtf TEXT     The gtf (gz or not) file for preparing utr and intron region.
+  --gtf TEXT     The gtf (gz or not, but must be sorted) file for preparing utr and intron region.
                  [required]
 
   --prefix TEXT  The prefix of output bed file.
@@ -37,7 +38,9 @@ run
 
 ```shell
 
+bedtools sort -i GRCh38.p12.cr.gtf  | bgzip > GRCh38.p12.cr.gtf.gz
 python main.py prepare --gtf GRCh38.p12.cr.gtf.gz --prefix GRCh38
+
 
 ```
 
@@ -71,3 +74,7 @@ python main.py apamix \
 --cb cellbarcode.tsv
 
 ```
+
+## Publications
+
+Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming.

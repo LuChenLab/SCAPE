@@ -6,7 +6,7 @@ from cli.apamix import apamix
 @click.group()
 def cli():
     """
-    A pure python package for analysing alternative polyadenylation at single cell levels.
+    An analysis framework for analysing alternative polyadenylation at single cell levels.
     Current version: 1.0.0
 
     """
