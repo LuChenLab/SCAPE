@@ -1,6 +1,6 @@
 # Single Cell Alternative Polyadenylation using Expectation-maximization (SCAPE)
 
-Visit [https://github.com/LuChenLab/SCAPE/wiki](wiki) for SCAPE documentation.
+Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) for SCAPE documentation.
 
 ## Usage
 
