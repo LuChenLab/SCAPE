@@ -243,7 +243,7 @@ FindBF <- function(obj,
                  assay = assay)[, cells.2]
   parallel::mclapply(rownames(mat.idents.1), function(x){
     val_1 <- na.omit(mat.idents.1[x, ])
-    val_2 <- na,omit(mat.idents.2[x, ])
+    val_2 <- na.omit(mat.idents.2[x, ])
     BayesFactor::ttestBF(
       x=val_1,
       y=val_2
