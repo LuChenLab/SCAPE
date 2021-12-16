@@ -6,7 +6,7 @@ SCAPE is a tool for estimating APA events from single-end or pair-end scRNA-seq 
 
 SCAPE models each pA sites as a Gaussian distribution, the corresponding isoform of which also has a weight (proportion). The final estimations are the mean and standard deviation of all pA sites, as well as their weights. The following figure shows the basic idea of SCAPE.
 
-<img src="https://github.com/zhou-ran/SCAPE/blob/main/image/model_graph.png" alt="model_graph" width="200" />
+<img src="https://github.com/zhou-ran/SCAPE/blob/main/image/model_graph.png" alt="model_graph" width="600" />
 
 ## Input 
 
