@@ -1,0 +1,37 @@
+rscript: /usr/bin/Rscript
+p_script:
+  add_tag: ../bin/add_tag.py
+
+MAPPER:
+  script: ../bin/run_MAAPER.R
+  pas_annotation: ../02.evaluation/MAAPER/code/mouse.PAS.mm10.rds
+  gtf: /mnt/raid/Ref/MusMus/release101/mm10/genes/genes.gtf
+
+scapa:
+  script: ../bin/run_scAPA.R
+scapatrap:
+  script: ../bin/run_scAPAtrap.R
+scapture:
+  script: ../bin/run_SCAPTURE.sh
+sierra:
+  script: ../bin/sierra.raw.R
+scdapars:
+  cov_threshold: 0
+  chrom: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,X,Y
+  p_script: ../bin/Dapars2_Multi_Sample.py
+
+gtf: 
+soft:
+  genomeCov: /usr/bin/genomeCoverageBed
+
+prepare_sc: ../bin/process_different_results.R
+
+collapse_sc: ../bin/collapse_utr_bed.py
+bm_sc: ../bin/benchmark.R
+bed: ../bin/filtered.bed
+generate_faked_pa: ../bin/generate_faked_pa.R
+simu_p: ../bin/simulation_fasta.py
+fasta: /mnt/raid/Ref/MusMus/release101/Mus_musculus.GRCm38.dna.primary_assembly.fa
+
+star: /mnt/raid/software/biosoft/STAR/STAR
+index: /mnt/raid/Ref/MusMus/release101/mm10/star

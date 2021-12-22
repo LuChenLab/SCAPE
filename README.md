@@ -96,6 +96,8 @@ python main.py apamix \
 
 Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) for SCAPE documentation.
 
-## Publications
+## Citation
+
+If you use SCAPE in your publication, please cite SCAPE by
 
 Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming.
