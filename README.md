@@ -97,7 +97,7 @@ python main.py apamix \
 
 ## Examples
 
-Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) for SCAPE documentation.
+Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) to run SCAPE on an example dataset.
 
 ## Citation
 
