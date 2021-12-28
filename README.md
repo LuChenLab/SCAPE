@@ -64,7 +64,7 @@ python main.py prepare --gtf GRCh38.p12.cr.gtf.gz --prefix GRCh38
 
 ### apamix
 
-Perform the actual alternative polyadenylation events inference. If one wants to change the default paramters such as insert size distribution, maximum number of pA sites etc, it can be done by modifying the file "apamix.py".
+Perform the actual alternative polyadenylation events inference. If one wants to change the default paramters such as insert size distribution, maximum number of pA sites etc, it can be done by modifying the file "apamix.py" under folder "apamix".
 
 ```
 Usage: python main.py apamix [OPTIONS]
