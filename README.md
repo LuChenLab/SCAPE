@@ -18,6 +18,11 @@ The Gene transfer format (GTF) is a file format used to hold information about g
 
 GTF files for different species can be downloaded from [Ensembl database](https://www.ensembl.org/info/data/ftp/index.html). 
 
+## Output
+
+TODO
+
+
 ## Usage
 
 SCAPE is written in Python. It is a pre-requisite to have python3 installed before running SCAPE. SCAPE has two general functions (1) data preprocessing and (2)  APA event inference. 
@@ -98,6 +103,11 @@ python main.py apamix \
 ## Examples
 
 Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) to run SCAPE on an example dataset.
+
+## Downstream analysis
+
+TODO
+The output of SCAPE can be built into a Seurat object in R, which could be easily use for downstream single cell analyses. 
 
 ## Citation
 
