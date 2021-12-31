@@ -20,7 +20,7 @@ GTF files for different species can be downloaded from [Ensembl database](https:
 
 ## Output
 
-TODO
+The output will be a csv file correpsonding to a pA count matrix. Each row is a pA site and each column is a cell. 
 
 
 ## Usage
@@ -106,8 +106,7 @@ Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) to run SCAPE on an example
 
 ## Downstream analysis
 
-TODO
-The output of SCAPE can be built into a Seurat object in R, which could be easily use for downstream single cell analyses. 
+The output of SCAPE can be loaded into a Seurat object in R, which could be easily use for downstream single cell analyses offered by Seurat. 
 
 ## Citation
 
