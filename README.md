@@ -22,6 +22,8 @@ GTF files for different species can be downloaded from [Ensembl database](https:
 
 The output will be a csv file correpsonding to a pA count matrix. Each row is a pA site and each column is a cell. 
 
+## Installation
+There is no need to install anything other than python3. Just download this repository and run the python scripts.
 
 ## Usage
 
