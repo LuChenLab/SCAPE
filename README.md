@@ -110,7 +110,7 @@ The output of SCAPE can be loaded into a Seurat object in R, which could be easi
 Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) for examples of running SCAPE.
 
 ## Methods comparison on simulated data
-The code for method comparison can be found [here](./simulation).
+The code for method comparison in our paper can be found [here](./simulation).
 
 ## Citation
 
