@@ -100,13 +100,17 @@ python main.py apamix \
 
 ```
 
+## Downstream analysis
+
+The output of SCAPE can be loaded into a Seurat object in R, which could be easily use for downstream single cell analyses offered by Seurat. 
+
+
 ## Examples
 
 Visit [wiki](https://github.com/LuChenLab/SCAPE/wiki) for examples of running SCAPE.
 
-## Downstream analysis
-
-The output of SCAPE can be loaded into a Seurat object in R, which could be easily use for downstream single cell analyses offered by Seurat. 
+## Methods comparison on simulated data
+The code for method comparison can be found [here](./simulation).
 
 ## Citation
 
