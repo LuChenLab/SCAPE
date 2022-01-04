@@ -14,7 +14,7 @@ from utils.bam import cigar_support, collapse_intron, check_strand
 
 
 def run(arg):
-    line, bamfile, cb_df, outdir, tag, verbose = arg
+    line, bamfile, cb_df, outdir, tag, verbose, n_max_apa, n_min_apa = arg
     region_name = line
     chrom, left_site, right_site, strand = line.split('\t')
 
@@ -198,8 +198,8 @@ def run(arg):
     utr_l = max([max(apa_reads.r2_utr_st_arr) + max(apa_reads.r2_len_arr) + 50, 1000])
 
     test = APA(
-        n_max_apa=8,
-        n_min_apa=1,
+        n_max_apa=int(n_max_apa),
+        n_min_apa=int(n_min_apa),
         r1_utr_st_arr=apa_reads.r2_utr_st_arr,
         r1_len_arr=apa_reads.r2_len_arr,
         r2_len_arr=apa_reads.r1_len_arr,

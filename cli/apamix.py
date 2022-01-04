@@ -66,6 +66,23 @@ logger.add('apamix.log',
     )
 
 @click.option(
+    '--n_max_apa',
+    type=int,
+    default='5',
+    help='The maximum number of pA sites. Default value is 5.',
+    required=True
+    )
+
+@click.option(
+    '--n_min_apa',
+    type=int,
+    default='5',
+    help='The minimum number of pA sites. Default value is 1.',
+    required=True
+    )
+
+
+@click.option(
     '--verbose',
     '-v',
     is_flag=True,
@@ -119,7 +136,7 @@ def apamix(
     res_lst = []
     try:
         for x in range(len(peak_lst)):
-            arg = [peak_lst[x], bam, cb_df, out, tag, verbose]
+            arg = [peak_lst[x], bam, cb_df, out, tag, verbose, n_max_apa, n_min_apa]
             res_lst.append(pool.apply_async(wraper_process, (arg,)))
 
     except KeyboardInterrupt:
