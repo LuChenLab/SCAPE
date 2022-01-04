@@ -16,6 +16,7 @@ rule all:
 		'MAAPER/result.rds',
 		'scDapars/dapars2_res.txt',
 		'Sierra/Sierra.Rds',
+		'SCAPE/pasite.csv.gz',
 		'benchmarks.RData'
 
 rule generate_bed:
@@ -274,6 +275,7 @@ rule merge_res:
 		"""
 		head -n 1 {params.prefix}/chromosome_10.txt > {output} && cat {params.prefix}/*.txt | grep -v "^Gene" >> {output}
 		"""
+
 rule make_bed:
 	input:
 		bin_loc + 'filtered.fake_pa.bed'
@@ -286,6 +288,53 @@ rule make_bed:
 		python {params.collapse_sc} {input} {output}
 		"""
 
+## here is for scape
+
+rule make_scape_bed:
+	input:
+		bin_loc + 'collapse.bed'
+	output:
+		'SCAPE/collapse.scape.bed'
+	shell:
+		"""
+		cut -f 1,2,3,6 {input} > {output}
+		"""
+rule make_scape_bed:
+	input:
+		bin_loc + 'collapse.bed'
+	output:
+		'SCAPE/collapse.scape.bed'
+	shell:
+		"""
+		cut -f 1,2,3,6 {input} > {output}
+		"""
+
+rule make_fake_bc:
+	output:
+		bc = 'SCAPE/barcode.tsv'
+	run:
+		with open(output.bc, 'w') as fh:
+			fh.write('A' * 12)
+
+rule scape:
+	input:
+		bc = 'SCAPE/barcode.tsv',
+		bed = 'SCAPE/collapse.scape.bed',
+		bam = expand(data_loc + '{sample}.Aligned.sortedByCoord.out.addtag.bam', sample = samples)
+	output:
+		'SCAPE/pasite.csv.gz'
+	params:
+		prefix = 'SCAPE'
+	shell:
+		'''
+		python ~/data/soft/scape/main.py apamix \
+		--bed {input.bed} \
+		--bam {input.bam} \
+		--cb {input.bc} \
+		-o {params.prefix} --cores 12 --tag CB,UR
+		'''
+
+
 rule prepare_res:
 	input:
 		bin_loc + 'collapse.bed',
@@ -295,7 +344,8 @@ rule prepare_res:
 		'SCAPTURE/simu.KeepCell.assigned',
 		'Sierra/sierra.Rds',
 		'MAAPER/result.rds',
-		'scDapars/dapars2_res.txt'
+		'scDapars/dapars2_res.txt',
+		'SCAPE/pasite.csv.gz'
 	output:
 		'Sierra/Sierra.Rds'
 	params:

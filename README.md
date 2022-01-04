@@ -77,15 +77,21 @@ Perform the actual alternative polyadenylation events inference. If one wants to
 Usage: python main.py apamix [OPTIONS]
 
 Options:
-  --bed TEXT       The target regions (bed format) used for mix inference
-                   [required]
+  --bed TEXT           The target regions (bed format) used for mix inference
+                       [required]
+  --bam TEXT           The bam file (sorted and indexed)  [required]
+  -o, --out TEXT       The output path  [required]
+  --cores INTEGER      Num (cores) of region are infering at once
+  --cb TEXT            The cell barcode file, one cb for one line.  [required]
+  --tag TEXT           The cell barcode and UMI tag, for 10X: CB,UB.
+                       [required]
+  --n_max_apa INTEGER  The maximum number of pA sites. Default value is 5.
+                       [required]
+  --n_min_apa INTEGER  The minimum number of pA sites. Default value is 1.
+                       [required]
+  -v, --verbose        Verbose mode
+  --help               Show this message and exit.
 
-  --bam TEXT       The bam file (sorted and indexed)  [required]
-  -o, --out TEXT   The output path  [required]
-  --cores INTEGER  Num (cores) of region are infering at once
-  --cb TEXT        The cell barcode file, one cb for one line.  [required]
-  -v, --verbose    Verbose mode
-  --help           Show this message and exit.
 ```
 
 run

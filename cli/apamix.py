@@ -76,8 +76,16 @@ logger.add('apamix.log',
 @click.option(
     '--n_min_apa',
     type=int,
-    default='5',
+    default='1',
     help='The minimum number of pA sites. Default value is 1.',
+    required=True
+    )
+
+@click.option(
+    '--max_utr_len',
+    type=int,
+    default='6000',
+    help='The maximum length of UTR. Default value is 6000.',
     required=True
     )
 
@@ -95,6 +103,9 @@ def apamix(
     cb,
     tag,
     cores,
+    n_max_apa,
+    n_min_apa,
+    max_utr_len,
     verbose
     ):
     if not all([bed, bam, out, cb]):
@@ -118,10 +129,8 @@ def apamix(
         if not i:
             continue
         chrom, st, en, strand = i.strip().split('\t')
-        if int(en) - int(st) + 1 > 6000:
-            logger.info(f'Skip more than 6 kb UTR, {chrom}_{st}_{en}_{strand}')
-            # too_long_file = f'{out}/TooLongRegion/{chrom}_{st}_{en}_{strand}'
-            # Path(too_long_file).touch()
+        if int(en) - int(st) + 1 > max_utr_len:
+            logger.info(f'Skip more than {max_utr_len} UTR, {chrom}_{st}_{en}_{strand}')
             continue
 
         peak_lst.append(i.strip())

@@ -252,7 +252,8 @@ list(
   SCAPTURE = 'SCAPTURE/SCAPTURE.Rds',
   scDaPars = 'scDapars/scDapars.Rds',
   Sierra = 'Sierra/Sierra.Rds',
-  polyApipe = 'polyApipe/polyApipe.Rds'
+  polyApipe = 'polyApipe/polyApipe.Rds',
+  SCAPE = 'SCAPE/SCAPE.Rds'
 ) -> dats
 
 

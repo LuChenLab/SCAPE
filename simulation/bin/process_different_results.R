@@ -458,3 +458,82 @@ dat <- data.table(
 
 saveRDS(dat, file = 'polyApipe/polyApipe.Rds')
 
+
+## SCAPE
+
+rm(list = ls())
+
+dat <- data.table::fread('pasite.csv.gz')
+colnames(dat)[2] <- 'count'
+dat_to_annot <-
+  data.table(do.call(rbind, strsplit(dat$V1, split = ':')))
+dat_to_annot$V1 <- paste0('chr', dat_to_annot$V1)
+dat_to_annot <- dat_to_annot[, c(1, 2, 4)]
+colnames(dat_to_annot) <- c('chr', 'coord', 'strand')
+
+dat$id <-
+  paste(dat_to_annot$chr,
+        dat_to_annot$coord,
+        dat_to_annot$strand,
+        sep = ':')
+library(org.Mm.eg.db)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+txdbmm10 <- movAPA::parseGenomeAnnotation(txdb)
+
+tmp <- movAPA::annotatePAC(dat_to_annot, aGFF = txdbmm10)
+
+test <- clusterProfiler::bitr(tmp$gene,
+                              fromType = 'ENTREZID',
+                              toType = 'SYMBOL',
+                              OrgDb = org.Mm.eg.db)
+tmp$gene_id <-
+  plyr::mapvalues(from = test$ENTREZID,
+                  to = test$SYMBOL,
+                  x = tmp$gene)
+tmp <- tmp[tmp$gene_id != "character(0)"]
+
+tmp$id <-
+  paste(tmp$chr, tmp$coord, tmp$strand, sep = ':')
+
+
+dat$gene_id <-
+  plyr::mapvalues(
+    from = tmp$id,
+    to = tmp$gene_id,
+    x = dat$id,
+    warn_missing = F
+  )
+
+dat$gene_id[dat$id == dat$gene_id] <- 'Unkown_gene'
+
+
+
+pa_weights <- dat %>% group_by(gene_id) %>%
+  mutate(pa_weights = count / sum(count)) %>%
+  ungroup() %>%
+  pull(pa_weights)
+
+dat$paid <- paste(
+  dat$gene_id,
+  sapply(strsplit(dat$V1, split = ':'), '[[', 1),
+  sapply(strsplit(dat$V1, split = ':'), '[[', 2),
+  sapply(strsplit(dat$V1, split = ':'), '[[', 2),
+  sapply(strsplit(dat$V1, split = ':'), '[[', 4),
+  sep = ':'
+)
+
+dat <- data.table(
+  gene_id = dat$gene_id,
+  chrom = sapply(strsplit(dat$V1, split = ':'), '[[', 1),
+  start = sapply(strsplit(dat$V1, split = ':'), '[[', 2),
+  end = sapply(strsplit(dat$V1, split = ':'), '[[', 2),
+  strand = sapply(strsplit(dat$V1, split = ':'), '[[', 4),
+  pa_site = gsub('^chr', '', dat$id),
+  pa_weights = pa_weights,
+  pa_counts = dat$count,
+  pa_id = dat$paid,
+  pa = sapply(strsplit(dat$V1, split = ':'), '[[', 2)
+)
+
+saveRDS(dat, file = 'SCAPE/SCAPE.Rds')
