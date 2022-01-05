@@ -7,7 +7,7 @@ SCAPE is a tool for estimating alternative polyadenylation (APA) events from sin
 SCAPE models each pA sites as a Gaussian distribution, the corresponding isoform of which also has a weight (proportion). The final estimations are the mean and standard deviation of all pA sites, as well as their weights. The following figure shows the basic idea of SCAPE.
 
 <p align="center">
-<img src="https://github.com/zhou-ran/SCAPE/blob/main/image/model_graph.png" alt="model_graph" width="600" />
+<img src="https://github.com/LuChenLab/SCAPE/blob/main/image/model_graph.png" alt="model_graph" width="600" />
 </p>
 
 
