@@ -12,9 +12,8 @@ from apamix.apamix import APA
 from utils.utils import dotdict, dict_list
 from utils.bam import cigar_support, collapse_intron, check_strand
 
-
 def run(arg):
-    line, bamfile, cb_df, outdir, tag, verbose, n_max_apa, n_min_apa = arg
+    line, bamfile, cb_df, outdir, tag, verbose, n_max_apa, n_min_apa, LA_dis_arr, pmf_LA_dis_arr = arg
     region_name = line
     chrom, left_site, right_site, strand = line.split('\t')
 
@@ -205,6 +204,8 @@ def run(arg):
         r2_len_arr=apa_reads.r1_len_arr,
         polya_len_arr=apa_reads.polya_len_arr,
         pa_site_arr=apa_reads.pa_site_arr,
+        LA_dis_arr=LA_dis_arr,
+        pmf_LA_dis_arr=pmf_LA_dis_arr,
         utr_len=utr_l,
         cb=apa_reads.cb,
         umi=apa_reads.umi,

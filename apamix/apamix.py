@@ -76,7 +76,7 @@ class APA:
             self.pmf_s_dis_arr = np.array(pmf_LA_dis_arr)
         else:
             self.s_dis_arr = np.arange(self.min_LA, self.max_LA, 10)
-            self.pmf_LA_dis_arr = np.repeat(1 / len(self.s_dis_arr), len(self.s_dis_arr))
+            self.pmf_s_dis_arr = np.repeat(1 / len(self.s_dis_arr), len(self.s_dis_arr))
         self.pmf_s_dis_arr = self.pmf_s_dis_arr / sum(self.pmf_s_dis_arr)
         self.nround = 50
 

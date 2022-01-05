@@ -84,9 +84,22 @@ logger.add('apamix.log',
 @click.option(
     '--max_utr_len',
     type=int,
-    default='6000',
-    help='The maximum length of UTR. Default value is 6000.',
-    required=True
+    default=6000,
+    help='The maximum length of UTR. Default value is 6000.'
+    )
+
+@click.option(
+    '--la_dis_arr',
+    type=str,
+    default=None,
+    help='The distinct lengths of polyA lengths in the dataset. Default: np.arange(self.min_LA, self.max_LA, 10). User counld pass `[10, 30, 50, 70, 90, 110, 130]`'
+    )
+
+@click.option(
+    '--pmf_la_dis_arr',
+    type=str,
+    default=None,
+    help='The the number of reads for each distinct polyA length. .Default: Unif(min_LA, max_LA). [309912, 4107929, 802856, 518229, 188316, 263208, 101]'
     )
 
 
@@ -106,6 +119,8 @@ def apamix(
     n_max_apa,
     n_min_apa,
     max_utr_len,
+    la_dis_arr,
+    pmf_la_dis_arr,
     verbose
     ):
     if not all([bed, bam, out, cb]):
@@ -122,6 +137,15 @@ def apamix(
     res_lst = []
     cb_df = pd.read_csv(cb, names=['cb'])
     # cb_df.cb = list(map(lambda x : x.split('-')[0], cb_df.cb.values))
+
+    if la_dis_arr and pmf_la_dis_arr:
+        la_dis_arr = eval(la_dis_arr)
+        pmf_la_dis_arr = eval(pmf_la_dis_arr)
+        if not (isinstance(la_dis_arr, list) and isinstance(pmf_la_dis_arr, list)):
+            sys.exit('la_dis_arr and pmf_la_dis_arr were not list format in python.')
+    else:
+        la_dis_arr = None
+        pmf_la_dis_arr = None
 
     peak_lst = []
 
@@ -145,7 +169,7 @@ def apamix(
     res_lst = []
     try:
         for x in range(len(peak_lst)):
-            arg = [peak_lst[x], bam, cb_df, out, tag, verbose, n_max_apa, n_min_apa]
+            arg = [peak_lst[x], bam, cb_df, out, tag, verbose, n_max_apa, n_min_apa, la_dis_arr, pmf_la_dis_arr]
             res_lst.append(pool.apply_async(wraper_process, (arg,)))
 
     except KeyboardInterrupt:

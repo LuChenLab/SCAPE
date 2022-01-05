@@ -77,21 +77,28 @@ Perform the actual alternative polyadenylation events inference. If one wants to
 Usage: python main.py apamix [OPTIONS]
 
 Options:
-  --bed TEXT           The target regions (bed format) used for mix inference
-                       [required]
-  --bam TEXT           The bam file (sorted and indexed)  [required]
-  -o, --out TEXT       The output path  [required]
-  --cores INTEGER      Num (cores) of region are infering at once
-  --cb TEXT            The cell barcode file, one cb for one line.  [required]
-  --tag TEXT           The cell barcode and UMI tag, for 10X: CB,UB.
-                       [required]
-  --n_max_apa INTEGER  The maximum number of pA sites. Default value is 5.
-                       [required]
-  --n_min_apa INTEGER  The minimum number of pA sites. Default value is 1.
-                       [required]
-  -v, --verbose        Verbose mode
-  --help               Show this message and exit.
-
+  --bed TEXT             The target regions (bed format) used for mix
+                         inference  [required]
+  --bam TEXT             The bam file (sorted and indexed)  [required]
+  -o, --out TEXT         The output path  [required]
+  --cores INTEGER        Num (cores) of region are infering at once
+  --cb TEXT              The cell barcode file, one cb for one line.
+                         [required]
+  --tag TEXT             The cell barcode and UMI tag, for 10X: CB,UB.
+                         [required]
+  --n_max_apa INTEGER    The maximum number of pA sites. Default value is 5.
+                         [required]
+  --n_min_apa INTEGER    The minimum number of pA sites. Default value is 1.
+                         [required]
+  --max_utr_len INTEGER  The maximum length of UTR. Default value is 6000.
+  --la_dis_arr TEXT      The distinct lengths of polyA lengths in the dataset.
+                         Default: np.arange(self.min_LA, self.max_LA, 10).
+                         User counld pass `[10, 30, 50, 70, 90, 110, 130]`
+  --pmf_la_dis_arr TEXT  The the number of reads for each distinct polyA
+                         length. .Default: Unif(min_LA, max_LA). [309912,
+                         4107929, 802856, 518229, 188316, 263208, 101]
+  -v, --verbose          Verbose mode
+  --help                 Show this message and exit.
 ```
 
 run

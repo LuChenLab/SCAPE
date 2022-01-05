@@ -76,7 +76,10 @@ def main(bamfile, config, outprefix):
 	oh.close()
 	points = sns.kdeplot(np.array(align_gap_list)).get_lines()[0].get_data()
 	x, y = points[:2]
-	plt.axvline(300, color='r')
+	mean_val = np.round(np.mean(np.array(align_gap_list)), 2)
+	std_val = np.round(np.std(np.array(align_gap_list)), 2)
+	plt.axvline(mean_val, color='r')
+	plt.title(f'mean = {mean_val}, std = {std_val}.')
 	plt.savefig(f"{outprefix}.pdf")
 
 			
