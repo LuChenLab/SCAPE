@@ -13,7 +13,7 @@ from utils.utils import dotdict, dict_list
 from utils.bam import cigar_support, collapse_intron, check_strand
 
 def run(arg):
-    line, bamfile, cb_df, outdir, tag, verbose, n_max_apa, n_min_apa, LA_dis_arr, pmf_LA_dis_arr = arg
+    line, bamfile, cb_df, outdir, tag, verbose, n_max_apa, n_min_apa, LA_dis_arr, pmf_LA_dis_arr,mu_f,sigma_f = arg
     region_name = line
     chrom, left_site, right_site, strand = line.split('\t')
 
@@ -209,6 +209,8 @@ def run(arg):
         utr_len=utr_l,
         cb=apa_reads.cb,
         umi=apa_reads.umi,
+        mu_f=mu_f,
+        sigma_f=sigma_f,
         region_name=region_name,
         verbose=verbose
     )

@@ -92,16 +92,28 @@ logger.add('apamix.log',
     '--la_dis_arr',
     type=str,
     default=None,
-    help='The distinct lengths of polyA lengths in the dataset. Default: np.arange(self.min_LA, self.max_LA, 10). User counld pass `[10, 30, 50, 70, 90, 110, 130]`'
+    help='The distinct lengths of polyA lengths in the dataset. Default: np.arange(10, 150, 10). User counld pass \'[10, 30, 50, 70, 90, 110, 130]\''
     )
 
 @click.option(
     '--pmf_la_dis_arr',
     type=str,
     default=None,
-    help='The the number of reads for each distinct polyA length. .Default: Unif(min_LA, max_LA). [309912, 4107929, 802856, 518229, 188316, 263208, 101]'
+    help='The the number of reads for each distinct polyA length. Default: Unif(10, 150). \'[309912, 4107929, 802856, 518229, 188316, 263208, 101]\''
     )
 
+@click.option(
+    '--mu_f',
+    type=int,
+    default=300,
+    help='The mean of insert size for illumina library. Default: 300'
+    )
+@click.option(
+    '--sigma_f',
+    type=int,
+    default=50,
+    help='The std of insert size for illumina library. Default: 50'
+    )
 
 @click.option(
     '--verbose',
@@ -121,6 +133,8 @@ def apamix(
     max_utr_len,
     la_dis_arr,
     pmf_la_dis_arr,
+    mu_f,
+    sigma_f,
     verbose
     ):
     if not all([bed, bam, out, cb]):
@@ -169,7 +183,7 @@ def apamix(
     res_lst = []
     try:
         for x in range(len(peak_lst)):
-            arg = [peak_lst[x], bam, cb_df, out, tag, verbose, n_max_apa, n_min_apa, la_dis_arr, pmf_la_dis_arr]
+            arg = [peak_lst[x], bam, cb_df, out, tag, verbose, n_max_apa, n_min_apa, la_dis_arr, pmf_la_dis_arr, mu_f, sigma_f]
             res_lst.append(pool.apply_async(wraper_process, (arg,)))
 
     except KeyboardInterrupt:

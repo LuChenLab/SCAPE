@@ -97,10 +97,12 @@ Options:
   --max_utr_len INTEGER  The maximum length of UTR. Default value is 6000.
   --la_dis_arr TEXT      The distinct lengths of polyA lengths in the dataset.
                          Default: np.arange(self.min_LA, self.max_LA, 10).
-                         User counld pass `[10, 30, 50, 70, 90, 110, 130]`
+                         User counld pass '[10, 30, 50, 70, 90, 110, 130]'.
   --pmf_la_dis_arr TEXT  The the number of reads for each distinct polyA
-                         length. .Default: Unif(min_LA, max_LA). [309912,
-                         4107929, 802856, 518229, 188316, 263208, 101]
+                         length. Default: Unif(min_LA, max_LA). '[309912,
+                         4107929, 802856, 518229, 188316, 263208, 101]'.
+  --mu_f INTEGER         The mean of insert size for illumina library. Default: 300
+  --sigma_f INTEGER      The std of insert size for illumina library. Default: 50
   -v, --verbose          Verbose mode
   --help                 Show this message and exit.
 ```
