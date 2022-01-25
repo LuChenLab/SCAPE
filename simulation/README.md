@@ -16,7 +16,7 @@ Here is the all package i used to perform performance testing, each package coul
 | SCAPTURE  |  Shell   |                Homer                 |          No          |          Yes          |    1    |            https://github.com/YangLab/SCAPTURE            |
 | scDaPars  |  python  |               DaPars2                |          No          |          No           |  0.1.0  |          https://github.com/YiPeng-Gao/scDaPars           |
 |  Sierra   |    R     |    fit a Guassian with NLS or MLE    |          No          |          Yes          | 0.99.27 |              https://github.com/VCCRI/Sierra              |
-|   SCAPE   |  python  |   Modeling based on fragment size    |          Yes          |          Yes          |  1.0.0  |            https://github.com/LuChenLab/SCAPE             |
+|   SCAPE   |  python  |   Modeling based on insert size    |          Yes          |          Yes          |  1.0.0  |            https://github.com/LuChenLab/SCAPE             |
 | polyApipe |  python  |   Soft clipped reads with poly(A)    |         Yes          |          Yes          |  0.1.0  | https://github.com/MonashBioinformaticsPlatform/polyApipe |
 
 
