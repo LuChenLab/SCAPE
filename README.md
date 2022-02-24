@@ -137,4 +137,4 @@ The code for method comparison in our paper can be found [here](./simulation).
 
 If you use SCAPE in your publication, please cite SCAPE by
 
-Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming.
+Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming. *Nucleic Acids Research*.
