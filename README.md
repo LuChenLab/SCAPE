@@ -34,6 +34,16 @@ There is no need to install anything other than python3. Just download this repo
 SCAPE is written in Python. It is a pre-requisite to have python3 installed before running SCAPE. SCAPE has two general functions (1) data preprocessing and (2)  APA event inference. 
 
 ```
+$ git clone https://github.com/LuChenLab/SCAPE
+
+$ conda create -n scape python=3.7.3
+
+$ conda source activate scape
+
+$ pip install -r SCAPE/requirements.txt
+
+$ python SCAPE/main.py --help
+
 Usage: python main.py [OPTIONS] COMMAND [ARGS]...
 
   An analysis framework for analysing alternative polyadenylation at single
@@ -47,6 +57,7 @@ Commands:
   prepare
 
 ```
+
 
 ### prepare
 
