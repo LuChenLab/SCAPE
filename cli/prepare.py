@@ -136,11 +136,13 @@ def prepare(
     sort and merge utr region information
     """
     bedtmp = pybedtools.BedTool(utr_outfile)
-    bedtmp = bedtmp.sort().merge(d=500, s = True, o='distinct', c='6')
-    mt_tmp = pybedtools.BedTool('\n'.join(mt_lst), from_string=True).sort().merge(s=True, o='distinct', c='6')
+    bedtmp = bedtmp.sort().merge(d=500, s = True)
+    
     utr_out = open(utr_outfile, 'w')
     utr_out.write(str(bedtmp))
-    utr_out.write(str(mt_tmp))
+    if mt_lst:
+        mt_tmp = pybedtools.BedTool('\n'.join(mt_lst), from_string=True).sort().merge(s=True)
+        utr_out.write(str(mt_tmp))
     utr_out.close()
 
     """
@@ -152,7 +154,7 @@ def prepare(
         '\n'.join(intron_lst), 
         from_string=True
         )
-    intron_bed = intron_bed.sort().merge(s = True, o='distinct', c='6')
+    intron_bed = intron_bed.sort().merge(s = True)
     intron_bed = intron_bed.intersect(bedtmp, v=True)
     intron_lst = []
     for line in intron_bed:

@@ -40,8 +40,8 @@ class Transcripts(GTFfile):
 
                 if "transcript_biotype" in line.attributes:
                     gene_structure[gid][tid]["transcript_biotype"] = line.attributes["transcript_biotype"]
-                elif "transcript_biotype" in line.attributes:
-                    gene_structure[gid][tid]["transcript_biotype"] = line.attributes["transcript_biotype"]
+                elif "transcript_type" in line.attributes:
+                    gene_structure[gid][tid]["transcript_type"] = line.attributes["transcript_type"]
 
                 gene_structure[gid][tid]["strand"] = line.strand
                 gene_structure[gid][tid][line.feature].append(
