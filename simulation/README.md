@@ -1,5 +1,8 @@
 # SingleCellAPA_evaluation
 
+<p align="center">
+<img src="https://github.com/LuChenLab/SCAPE/blob/main/image/simulation.jpg" alt="Simulation" width="600" />
+</p>
 
 
 ## Package list
