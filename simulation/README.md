@@ -47,4 +47,4 @@ snakemake -s simu_run.py
 
 ## Publication
 
-Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming. *Nucleic Acids Research*.
+Zhou *et al*. SCAPE: A mixture model revealing single-cell polyadenylation diversity and cellular dynamic during cell differentiation and reprogramming. *Nucleic Acids Research*. 2022, gkac167, https://doi.org/10.1093/nar/gkac167
