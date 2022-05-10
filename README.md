@@ -74,10 +74,10 @@ Options:
   --help         Show this message and exit.
 ```
 
-run
+run with bedtools version 2.26.0 
 
 ```shell
-
+# bedtools v2.26.0
 bedtools sort -i GRCh38.p12.cr.gtf  | bgzip > GRCh38.p12.cr.gtf.gz
 python main.py prepare --gtf GRCh38.p12.cr.gtf.gz --prefix GRCh38
 
