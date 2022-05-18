@@ -169,6 +169,7 @@ def prepare(
         from_string=True
         )
     intron_bed = intron_bed.subtract(exon_from_gtf, s=True)
-    intron_out = open(intron_outfile, 'w')
-    intron_out.write(str(intron_bed))
-    intron_out.close()
+    with open(intron_outfile, 'w') as intron_out:
+        for line in intron_bed:
+            line = str(line).strip().split('\t')
+            intron_out.write('\t'.join([line[0],line[1], line[2], line[-1]]) + '\n')
