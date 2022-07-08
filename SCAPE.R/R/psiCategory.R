@@ -33,7 +33,7 @@ psi <- function(obj,
   rownames(annot) <- annot[['V1']]
 
   ##keep PA.id within ensembl gene
-  annoG <- annot[grep("^ENSMUS", annot$V2), ]
+  annoG <- annot[grep("^ENS", annot$V2), ]
   add.id <- annoG[rownames(mat),]
   add.id <- na.omit(add.id)
 

@@ -18,9 +18,11 @@ annotate_from_gtf <-
 
     if (species_map[[genome_ver]] == 'Mm') {
       require(org.Mm.eg.db)
+      current_genome = org.Mm.eg.db
       x_map = get(sprintf('org.Mm.egSYMBOL', genome_ver))
     } else if (species_map[[genome_ver]] == 'Hg') {
       require(org.Hs.eg.db)
+      current_genome = org.Hs.eg.db
       x_map = get(sprintf('org.Hs.egSYMBOL', genome_ver))
     } else {
       stop("Can't recognize the genome version!")
@@ -35,7 +37,7 @@ annotate_from_gtf <-
     eg2symbol = as.data.frame(x_map[mapped_genes])
     eg2symbol$ensemble <-
       AnnotationDbi::mapIds(
-        org.Mm.eg.db,
+        current_genome,
         keys = eg2symbol$gene_id,
         keytype = "ENTREZID",
         column = "ENSEMBL"
