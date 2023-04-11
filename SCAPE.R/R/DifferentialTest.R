@@ -125,13 +125,14 @@ FindDE <- function(obj,
   )
   suppressMessages(require(magrittr))
   suppressMessages(require(DEXSeq))
+  suppressMessages(require(BiocParallel))
   if (cores != 1) {
-    BPPARAM = BiocParallel::MulticoreParam(cores)
-    dxd %<>%
-      estimateSizeFactors %<>%
-      estimateDispersions(BPPARAM = BPPARAM) %<>%
-      testForDEU(BPPARAM = BPPARAM) %<>%
-      estimateExonFoldChanges(BPPARAM = BPPARAM)
+    BPPARAM = MulticoreParam(cores)
+
+    dxd <- estimateSizeFactors(dxd)
+    dxd <- estimateDispersions(object= dxd, BPPARAM = BPPARAM)
+    dxd <- testForDEU(object= dxd, BPPARAM = BPPARAM)
+    dxd <- estimateExonFoldChanges(object= dxd, BPPARAM = BPPARAM)
 
   } else {
     dxd %<>%

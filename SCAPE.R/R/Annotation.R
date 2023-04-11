@@ -73,7 +73,7 @@ annotate_from_gtf <-
 
     x <- lapply(exons_grl, function(x) {
       exonrank <- length(x$exon_rank)
-      if (as.character(strand(x)) == "+") {
+      if (as.character(unique(strand(x))) == "+") {
         x[exonrank]
       } else{
         x[1]
