@@ -1,4 +1,5 @@
 
+
 #'@title Find differentail expression APA events
 #'@description Find DE APA events by DEXseq test
 #'@param obj A Seurat object which contained apa matrix information.
@@ -26,7 +27,7 @@
 
 FindDE <- function(obj,
                    idents.1,
-                   idents.2=NULL,
+                   idents.2 = NULL,
                    annot,
                    paLoc = '3UTRs',
                    slot = 'counts',
@@ -37,14 +38,14 @@ FindDE <- function(obj,
   set.seed(seedUse)
   # here to keep these pa which located in 3UTRs, and was part of APA evens.
   annot <-
-    annot[annot$pa_site %in% rownames(GetAssayData(obj, slot = 'counts', assay = assay)) &
+    annot[annot$pa_site %in% rownames(Seurat::GetAssayData(obj, slot = 'counts', assay = assay)) &
             !is.na(annot$annot.symbol) &
-            annot$Type %in% paLoc, ]
+            annot$Type %in% paLoc,]
 
   freq_to_filter <- table(annot$annot.symbol)
 
   annot <-
-    annot[annot$annot.symbol %in% names(freq_to_filter)[freq_to_filter != 1],]
+    annot[annot$annot.symbol %in% names(freq_to_filter)[freq_to_filter != 1], ]
 
   pa_use <- annot$pa_site
 
@@ -66,7 +67,7 @@ FindDE <- function(obj,
   for (i in 1:length(cells.sub.1)) {
     this.set <- cells.sub.1[[i]]
     sub.matrix <-
-      GetAssayData(obj, slot = "counts", assay = assay)[pa_use, this.set]
+      Seurat::GetAssayData(obj, slot = "counts", assay = assay)[pa_use, this.set]
     if (length(this.set) > 1) {
       this.profile <- as.numeric(apply(sub.matrix, 1, function(x)
         sum(x)))
@@ -122,7 +123,8 @@ FindDE <- function(obj,
     transcripts = NULL,
     alternativeCountData = NULL
   )
-  require(magrittr)
+  suppressMessages(require(magrittr))
+  suppressMessages(require(DEXSeq))
   if (cores != 1) {
     BPPARAM = BiocParallel::MulticoreParam(cores)
     dxd %<>%
@@ -138,7 +140,7 @@ FindDE <- function(obj,
       testForDEU %<>%
       estimateExonFoldChanges
   }
-  dxr1 = DEXSeqResults(dxd)
+  dxr1 = DEXSeq::DEXSeqResults(dxd)
   dxr1 <-
     dxr1[, c("groupID",
              "pvalue",
@@ -153,7 +155,7 @@ FindDE <- function(obj,
 
   dxr1[["pct.1"]] <-
     apply(
-      X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.1],
+      X = Seurat::GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.1],
       MARGIN = 1,
       FUN = Seurat:::PercentAbove,
       threshold = 0
@@ -162,7 +164,7 @@ FindDE <- function(obj,
   if (is.null(idents.2)) {
     dxr1[["pct.2"]] <-
       apply(
-        X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) != idents.1],
+        X = Seurat::GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) != idents.1],
         MARGIN = 1,
         FUN = Seurat:::PercentAbove,
         threshold = 0
@@ -172,7 +174,7 @@ FindDE <- function(obj,
     dxr1[['versus']] <- glue::glue('{idents.1}_Vs_{idents.2}')
     dxr1[["pct.2"]] <-
       apply(
-        X = GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.2],
+        X = Seurat::GetAssayData(obj, "counts", assay = assay)[pa_use, Idents(obj) == idents.2],
         MARGIN = 1,
         FUN = Seurat:::PercentAbove,
         threshold = 0
@@ -223,13 +225,13 @@ FindBF <- function(obj,
                    seedUse = 1) {
   set.seed(seedUse)
   cells.1 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) == idents.1)]
-  
+
   # here for idents.1
   mat.idents.1 <-
-    GetAssayData(obj,
+    Seurat::GetAssayData(obj,
                  slot = slot,
                  assay = assay)[, cells.1]
-  
+
   # here for idents.2
   if (is.null(idents.2)) {
     cells.2 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) != idents.1)]
@@ -237,28 +239,21 @@ FindBF <- function(obj,
     cells.2 = names(Seurat::Idents(obj))[which(Seurat::Idents(obj) == idents.2)]
   }
 
-  mat.idents.2 <- 
-    GetAssayData(obj,
+  mat.idents.2 <-
+    Seurat::GetAssayData(obj,
                  slot = slot,
                  assay = assay)[, cells.2]
-  parallel::mclapply(rownames(mat.idents.1), function(x){
-    val_1 <- na.omit(mat.idents.1[x, ])
-    val_2 <- na.omit(mat.idents.2[x, ])
-    BayesFactor::ttestBF(
-      x=val_1,
-      y=val_2
-    )@bayesFactor$bf -> bf_val
+  parallel::mclapply(rownames(mat.idents.1), function(x) {
+    val_1 <- na.omit(mat.idents.1[x,])
+    val_2 <- na.omit(mat.idents.2[x,])
+    BayesFactor::ttestBF(x = val_1,
+                         y = val_2)@bayesFactor$bf -> bf_val
     delta_psi <- mean(val_1) - mean(val_2)
     val <- c(bf_val, delta_psi)
-    names(val)-> c('BayesFactor', 'Delta_psi')
+    names(val) <- c('BayesFactor', 'Delta_psi')
     val
   }) -> res
-  as.data.frame(do.call(rbind,res)) -> res
+  as.data.frame(do.call(rbind, res)) -> res
   res$pa_site <- rownames(mat.idents.1)
   res
 }
-
-
-
-
-

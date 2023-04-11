@@ -12,6 +12,7 @@ Load gene expression and umap information from prepared datasets.
 ``` r
 library(Seurat)
 library(SCAPE)
+library(DEXSeq)
 library(magrittr)
 library(ggplot2)
 # Load gene expression
