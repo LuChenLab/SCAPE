@@ -10,6 +10,20 @@ SCAPE models each pA sites as a Gaussian distribution, the corresponding isoform
 <img src="https://github.com/LuChenLab/SCAPE/blob/main/image/model_graph.png" alt="model_graph" width="600" />
 </p>
 
+## [SCAPE-APA](https://github.com/chengl7-lab/scape) (A update version, 2024.3.15)
+
+To accommodate the analysis of extensive scRNA-seq datasets, SCAPE-APA has been introduced as a revamped version of SCAPE, incorporating significant modifications. The updates to the package include:
+
+1. Grouping similar reads to expedite the estimation process.
+2. A revised mixture model specifically adapted for binned reads.
+3. Implementation of a Taichi framework for enhanced computational speed.
+4. Detection of erroneous alternative polyadenylation sites arising from junction reads.
+5. Support for installation via PyPI.
+
+
+ref: [SCAPE-APA: a package for estimating alternative polyadenylation events from scRNA-seq data](https://www.biorxiv.org/content/10.1101/2024.03.12.584547v1)
+
+
 
 
 ## Input 
